@@ -1,86 +1,51 @@
 import React from 'react'
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 
 function Form() {
-    const [formData, setFormData] = useState({
-        fullName: '',
-        email: '',
-        phoneNumber: ''
-      });
-    
-      const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
-      };
-    
-      const handleSubmit = async(e) => {
-        e.preventDefault();
-        console.log('Form submitted:', formData);
-        const data = new FormData();
-        data.append('fullName', formData.fullName);
-        data.append('email', formData.email);
-        data.append('phoneNumber', formData.phoneNumber);
-       // your URL.
-    
-        const Sheet_Url="https://script.google.com/macros/s/AKfycbxcNrWj2IJ5S1G-AnBbMcykqPolv2egFfbjYkX6fsIGP5SJETdYb2dgkn9hPjgabik7/exec"
-        try {
-          await fetch(Sheet_Url, {
-            method: 'POST',
-            body: data,
-            muteHttpExceptions: true,
-          });
-    
-          setFormData({
-            fullNameame: '',
-            email: '',
-            phoneNumber: '',
-          });
-        } catch (error) {
-          console.log(error);
-        }
-      };
-    
-  return (
-    <div className="App">
-    <header className="App-header">
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="fullName">Full Name:</label>
-          <input
-            type="text"
-            id="fullName"
-            name="fullName"
-            value={formData.fullName}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div>
-          <label htmlFor="email">Email:</label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div>
-          <label htmlFor="phoneNumber">Phone Number:</label>
-          <input
-            type="tel"
-            id="phoneNumber"
-            name="phoneNumber"
-            value={formData.phoneNumber}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <button type="submit">Submit</button>
+  const formRef = useRef(null)
+  const scriptUrl = "https://script.google.com/macros/s/AKfycbxFi-QMtsX7lPhoKplEV58u5_TiOW03PDVUAssIV8g4fGlygSGhSSuEvXtXTvZI1feIJg/exec"
+  const [loading, setLoading] = useState(false)
+
+  const handleSubmit = (e) =>{
+      e.preventDefault()
+      setLoading(true)
+
+      fetch(scriptUrl, {
+      method: 'POST', 
+      body: new FormData(formRef.current),
+
+  }).then(res => {
+          console.log("SUCCESSFULLY SUBMITTED")
+          setLoading(false)
+      })
+      .catch(err => console.log(err))
+  }
+
+return (
+      <div className="container">
+      <form  ref={formRef} onSubmit={handleSubmit} name="google-sheet">
+      <div className="input-style">
+          <label htmlFor='name'>
+              Name
+          </label>
+          <input type="text" id="name"  name="name" placeholder='Your Name *' />
+      </div>  
+      <div className="input-style">
+          <label htmlFor='name'>Email</label>
+          <input type="email" name="email" placeholder='Your Email *' />
+      </div>
+      <div className="input-style">
+          <label htmlFor='name'>Phone No</label>
+          <input type="number" name="phone" placeholder='Your Phone *' />
+      </div>
+      <div className="input-style">
+
+          <input type="submit" value={loading ? "Loading..." : "SEND MESSAGE"} />
+      </div> 
       </form>
-    </header>
-  </div>
-  )
+      </div>
+ 
+)
 }
 
 export default Form
